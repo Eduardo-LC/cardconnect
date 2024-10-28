@@ -1,6 +1,9 @@
 package com.koerich.cardconnect.service;
 
 import com.koerich.cardconnect.dto.response.DeckResponse;
+import com.koerich.cardconnect.exception.BadRequestException;
+import com.koerich.cardconnect.exception.NotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -15,41 +18,19 @@ public class DeckService {
         this.restTemplate = restTemplate;
     }
 
-    public DeckResponse createAndShuffleDeck(int deckCount) {
+    public DeckResponse createAndShuffleDeck(int deckCount) throws BadRequestException {
+        if(deckCount <= 0){
+            throw new BadRequestException("deck count must be greater than 0", HttpStatus.BAD_REQUEST);
+        }
         String url = UriComponentsBuilder.fromHttpUrl(BASE_URL + "/new/shuffle/")
                 .queryParam("deck_count", deckCount)
                 .toUriString();
+
         return restTemplate.getForObject(url, DeckResponse.class);
     }
 
     public DeckResponse drawCards(String deckId, int count) {
         String url = UriComponentsBuilder.fromHttpUrl(BASE_URL + "/" + deckId + "/draw/")
-                .queryParam("count", count)
-                .toUriString();
-        return restTemplate.getForObject(url, DeckResponse.class);
-    }
-
-    //futuras implementações ...
-
-    public DeckResponse shuffleDeck(String deckId) {
-        String url = BASE_URL + "/" + deckId + "/shuffle/";
-        return restTemplate.getForObject(url, DeckResponse.class);
-    }
-
-    public DeckResponse addToPile(String deckId, String pileName, String cards) {
-        String url = UriComponentsBuilder.fromHttpUrl(BASE_URL + "/" + deckId + "/pile/" + pileName + "/add/")
-                .queryParam("cards", cards)
-                .toUriString();
-        return restTemplate.getForObject(url, DeckResponse.class);
-    }
-
-    public DeckResponse listPileCards(String deckId, String pileName) {
-        String url = BASE_URL + "/" + deckId + "/pile/" + pileName + "/list/";
-        return restTemplate.getForObject(url, DeckResponse.class);
-    }
-
-    public DeckResponse drawFromPile(String deckId, String pileName, int count) {
-        String url = UriComponentsBuilder.fromHttpUrl(BASE_URL + "/" + deckId + "/pile/" + pileName + "/draw/")
                 .queryParam("count", count)
                 .toUriString();
         return restTemplate.getForObject(url, DeckResponse.class);

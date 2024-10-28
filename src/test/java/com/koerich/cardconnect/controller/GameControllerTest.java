@@ -3,6 +3,8 @@ package com.koerich.cardconnect.controller;
 import com.koerich.cardconnect.dto.PlayerDto;
 import com.koerich.cardconnect.dto.request.GameStartRequest;
 import com.koerich.cardconnect.dto.response.DeckResponse;
+import com.koerich.cardconnect.exception.BadRequestException;
+import com.koerich.cardconnect.exception.NoContentException;
 import com.koerich.cardconnect.exception.NotFoundException;
 import com.koerich.cardconnect.exception.UnauthorizedException;
 import com.koerich.cardconnect.service.DeckService;
@@ -40,7 +42,7 @@ class GameControllerTest {
     }
 
     @Test
-    void startGame_ShouldReturnListOfPlayers() throws UnauthorizedException, NotFoundException {
+    void startGame_ShouldReturnListOfPlayers() throws NotFoundException, BadRequestException {
         String deckId = UUID.randomUUID().toString();
 
         DeckResponse mockDeckResponse = new DeckResponse();
@@ -61,7 +63,6 @@ class GameControllerTest {
 
         ResponseEntity<List<PlayerDto>> response = gameController.startGame(request);
 
-        // Assertions
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(2, Objects.requireNonNull(response.getBody()).size());
         assertEquals("Player 1", response.getBody().get(0).getName());
@@ -69,7 +70,7 @@ class GameControllerTest {
     }
 
     @Test
-    void getWinners_ShouldReturnListOfWinners() throws NotFoundException {
+    void getWinners_ShouldReturnListOfWinners() throws NoContentException {
         String gameId = UUID.randomUUID().toString();
         List<PlayerDto> mockWinners = List.of(
                 new PlayerDto("Player 2", List.of("8C", "KS", "QC", "JC", "AH"), gameId, 35)

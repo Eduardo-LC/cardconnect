@@ -3,16 +3,16 @@ package com.koerich.cardconnect.service;
 import com.koerich.cardconnect.dto.PlayerDto;
 import com.koerich.cardconnect.dto.response.DeckResponse;
 import com.koerich.cardconnect.dto.response.CardResponse;
-import com.koerich.cardconnect.exception.NotFoundException;
-import com.koerich.cardconnect.exception.UnauthorizedException;
+import com.koerich.cardconnect.exception.BadRequestException;
+import com.koerich.cardconnect.exception.NoContentException;
 import com.koerich.cardconnect.model.Player;
 import com.koerich.cardconnect.repository.PlayerRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -28,15 +28,17 @@ public class PlayerService {
     }
 
     @Transactional
-    public List<PlayerDto> createPlayers(String deckId, int playerCount, int cardsPerHand) throws NotFoundException {
+    public List<PlayerDto> createPlayers(String deckId, int playerCount, int cardsPerHand) throws BadRequestException {
         String gameId = UUID.randomUUID().toString();
         List<PlayerDto> players = new ArrayList<>();
-
+        if (playerCount <=0){
+            throw new BadRequestException("please enter more than one player", HttpStatus.BAD_REQUEST);
+        }
         for (int i = 0; i < playerCount; i++) {
             DeckResponse drawResult = deckService.drawCards(deckId, cardsPerHand);
 
             if (!drawResult.isSuccess() || drawResult.getCards() == null || drawResult.getCards().isEmpty()) {
-                throw new NotFoundException("Not enough cards to distribute to players.");
+                throw new BadRequestException("Not enough cards to distribute to players.", HttpStatus.BAD_REQUEST);
             }
 
             List<String> cardCodes = drawResult.getCards().stream()
@@ -59,11 +61,11 @@ public class PlayerService {
 
 
     @Transactional
-    public List<PlayerDto> getWinners(String gameId) throws NotFoundException {
+    public List<PlayerDto> getWinners(String gameId) throws NoContentException {
         List<Player> players = playerRepository.findByGameId(gameId);
 
         if (players.isEmpty()) {
-            throw new NotFoundException("No players found for game ID: " + gameId);
+            throw new NoContentException("No players found for game ID: " + gameId, HttpStatus.NO_CONTENT);
         }
 
         List<PlayerDto> playerDtos = players.stream()

@@ -2,6 +2,7 @@ package com.koerich.cardconnect.service;
 
 import com.koerich.cardconnect.dto.response.CardResponse;
 import com.koerich.cardconnect.dto.response.DeckResponse;
+import com.koerich.cardconnect.exception.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -33,7 +34,7 @@ class DeckServiceTest {
     }
 
     @Test
-    void createAndShuffleDeck_ShouldReturnDeckData() {
+    void createAndShuffleDeck_ShouldReturnDeckData() throws BadRequestException {
         DeckResponse mockResponse = new DeckResponse();
         mockResponse.setShuffled(true);
         mockResponse.setRemaining(52);

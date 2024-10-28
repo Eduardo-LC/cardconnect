@@ -1,4 +1,3 @@
-
 # Card Connect API
 
 Bem-vindo ao projeto Card Connect API! Este projeto cria uma API para gerenciamento de jogadores e cartas de baralho, integrando com uma API de baralhos externa.
@@ -51,7 +50,7 @@ Bem-vindo ao projeto Card Connect API! Este projeto cria uma API para gerenciame
    - As credenciais de acesso ao banco de dados são:
      - **Servidor**: `db`
      - **Usuário**: `dudu`
-     - **Senha**: `dudu123`
+     - **Senha**: `123456`
      - **Banco de dados**: `postgres`
 
 ## Encerrando os Containers

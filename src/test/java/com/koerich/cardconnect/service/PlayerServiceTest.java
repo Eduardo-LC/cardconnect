@@ -3,6 +3,8 @@ package com.koerich.cardconnect.service;
 import com.koerich.cardconnect.dto.PlayerDto;
 import com.koerich.cardconnect.dto.response.CardResponse;
 import com.koerich.cardconnect.dto.response.DeckResponse;
+import com.koerich.cardconnect.exception.BadRequestException;
+import com.koerich.cardconnect.exception.NoContentException;
 import com.koerich.cardconnect.exception.NotFoundException;
 import com.koerich.cardconnect.model.Player;
 import com.koerich.cardconnect.repository.PlayerRepository;
@@ -38,7 +40,7 @@ class PlayerServiceTest {
     }
 
     @Test
-    void createPlayers_ShouldReturnPlayerList() throws NotFoundException {
+    void createPlayers_ShouldReturnPlayerList() throws NotFoundException, BadRequestException {
         String deckId = UUID.randomUUID().toString();
         int playerCount = 2;
         int cardsPerHand = 5;
@@ -77,7 +79,6 @@ class PlayerServiceTest {
     void createPlayers_ShouldThrowNotFoundException_WhenNotEnoughCards() {
         String deckId = UUID.randomUUID().toString();
 
-        // Mock para retornar falha ao distribuir as cartas
         DeckResponse mockDeckResponse = new DeckResponse();
         mockDeckResponse.setSuccess(false);
         when(deckService.drawCards(eq(deckId), anyInt())).thenReturn(mockDeckResponse);
@@ -86,7 +87,7 @@ class PlayerServiceTest {
     }
 
     @Test
-    void getWinners_ShouldReturnPlayersWithHighestScore() throws NotFoundException {
+    void getWinners_ShouldReturnPlayersWithHighestScore() throws NoContentException {
         String gameId = UUID.randomUUID().toString();
 
         List<Player> mockPlayers = List.of(
@@ -95,7 +96,6 @@ class PlayerServiceTest {
         );
         when(playerRepository.findByGameId(eq(gameId))).thenReturn(mockPlayers);
 
-        // Execução do método
         List<PlayerDto> winners = playerService.getWinners(gameId);
 
         assertEquals(1, winners.size());

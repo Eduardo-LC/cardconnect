@@ -3,8 +3,9 @@ package com.koerich.cardconnect.controller;
 import com.koerich.cardconnect.dto.PlayerDto;
 import com.koerich.cardconnect.dto.request.GameStartRequest;
 import com.koerich.cardconnect.dto.response.DeckResponse;
+import com.koerich.cardconnect.exception.BadRequestException;
+import com.koerich.cardconnect.exception.NoContentException;
 import com.koerich.cardconnect.exception.NotFoundException;
-import com.koerich.cardconnect.exception.UnauthorizedException;
 import com.koerich.cardconnect.service.DeckService;
 import com.koerich.cardconnect.service.PlayerService;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class GameController {
 
     @GetMapping("/start")
     public ResponseEntity<List<PlayerDto>> startGame(
-            @ModelAttribute GameStartRequest request) throws UnauthorizedException, NotFoundException {
+            @ModelAttribute GameStartRequest request) throws BadRequestException {
         DeckResponse deckData = deckService.createAndShuffleDeck(request.getDeckCount());
         String deckId = deckData.getDeckId();
         List<PlayerDto> players = playerService.createPlayers(deckId, request.getPlayerCount(), request.getCardsPerHand());
@@ -35,7 +36,7 @@ public class GameController {
 
 
     @GetMapping("/winner")
-    public ResponseEntity<List<PlayerDto>> getWinners(@RequestParam String gameId) throws NotFoundException {
+    public ResponseEntity<List<PlayerDto>> getWinners(@RequestParam String gameId) throws NoContentException {
         List<PlayerDto> winners = playerService.getWinners(gameId);
         return ResponseEntity.ok(winners);
     }
